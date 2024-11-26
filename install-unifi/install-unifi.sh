@@ -4,7 +4,7 @@
 # Installs the Uni-Fi controller software on a FreeBSD machine (presumably running pfSense).
 
 # The latest version of UniFi:
-UNIFI_SOFTWARE_URL="https://dl.ui.com/unifi/7.2.97/UniFi.unix.zip"
+UNIFI_SOFTWARE_URL="https://dl.ui.com/unifi/8.6.9/UniFi.unix.zip"
 
 
 # The rc script associated with this branch or fork:
@@ -92,6 +92,12 @@ for old_mongo in "${old_mongos}"; do
   pkg unlock -yq ${package}
   env ASSUME_ALWAYS_YES=YES /usr/sbin/pkg delete ${package}
 done
+old_jdks=`pkg info | grep openjdk | grep -v openjdk17`
+for old_jdk in "${old_jdks}"; do
+  package=`echo "$old_jdk" | cut -d' ' -f1`
+  pkg unlock -yq ${package}
+  env ASSUME_ALWAYS_YES=YES /usr/sbin/pkg delete ${package}
+done
 echo " done."
 
 
@@ -118,8 +124,7 @@ AddPkg () {
   else
     env ASSUME_ALWAYS_YES=YES /usr/sbin/pkg add -f "$pkgurl" || exit 1
 
-    # if update openjdk8 then force detele snappyjava to reinstall for new version of openjdk
-    if [ "$pkgname" == "openjdk8" ]; then
+    if [ "$pkgname" == "openjdk17" ]; then
       pkg unlock -yq snappyjava
       env ASSUME_ALWAYS_YES=YES /usr/sbin/pkg delete snappyjava
     fi
@@ -128,10 +133,16 @@ AddPkg () {
 }
 
 #Add the following Packages for installation or reinstallation (if something was removed)
+AddPkg libdeflate
 AddPkg png
 AddPkg brotli
 AddPkg freetype2
 AddPkg fontconfig
+AddPkg jpeg-turbo
+AddPkg jbigkit
+AddPkg lerc
+AddPkg tiff
+AddPkg lcms2
 AddPkg alsa-lib
 AddPkg mpdecimal
 AddPkg python37
@@ -152,10 +163,19 @@ AddPkg libXi
 AddPkg libXt
 AddPkg libXtst
 AddPkg libXrender
+AddPkg libXrandr
 AddPkg libinotify
+AddPkg encodings
+AddPkg dejavu
+AddPkg font-bh-ttf
+AddPkg font-misc-ethiopic
+AddPkg font-misc-meltho
+AddPkg xorg-fonts-truetype
+AddPkg graphite2
+AddPkg harfbuzz
 AddPkg javavmwrapper
 AddPkg java-zoneinfo
-AddPkg openjdk8
+AddPkg openjdk17
 AddPkg snappyjava
 AddPkg snappy
 AddPkg cyrus-sasl
